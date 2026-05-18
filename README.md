@@ -33,7 +33,8 @@ Construir una solución backend **escalable y profesional** que permita:
 | Excel: plantilla, exportar, importar (productos y trabajadores) | ✅ |
 | CORS para Angular (`localhost:4200`) | ✅ |
 | Carrito, pedidos, domicilios, geolocalización, n8n | 🔜 Planificado |
-| Docker y CI | 🔜 En progreso |
+| Docker Compose (API + PostgreSQL) | ✅ |
+| Despliegue en nube (Render + Supabase) | 🔜 |
 
 ---
 
@@ -310,26 +311,52 @@ Copia `.env.example` a `.env`:
 
 ### Requisitos
 
-- Python 3.11 o superior
-- Git
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (recomendado — API + PostgreSQL)
+- O bien: Python 3.11+ y Git (solo desarrollo local con SQLite)
 
-### Pasos
+### 🐳 Docker — API + PostgreSQL (producción)
+
+Un solo comando levanta **FastAPI** y **PostgreSQL** con datos persistentes en el volumen `postgres_data`.
 
 ```powershell
-# Clonar e ingresar al proyecto
 cd PanaderíaProjectBackEnd
 
-# Entorno virtual
+# 1. Variables de entorno (solo la primera vez)
+copy .env.example .env
+# Edita .env: POSTGRES_PASSWORD y CORS_ORIGINS
+
+# 2. Levantar todo
+docker compose up --build
+```
+
+Atajos:
+
+```powershell
+.\scripts\up.ps1          # equivalente a compose up --build
+.\scripts\up.ps1 -d       # en segundo plano (pasa -d al compose)
+.\scripts\down.ps1        # detener contenedores
+```
+
+| Servicio | Contenedor | URL / puerto |
+|----------|------------|--------------|
+| API | `panaderia-api` | http://127.0.0.1:8000/docs |
+| PostgreSQL | `panaderia-db` | `localhost:5432` (opcional, depuración) |
+
+> Los datos de Postgres **no** están en `panaderia.db`; viven en el volumen Docker `postgres_data`.
+
+### 💻 Desarrollo local sin Docker (SQLite)
+
+```powershell
+cd PanaderíaProjectBackEnd
 python -m venv venv
 .\venv\Scripts\Activate.ps1
-
-# Dependencias
 python -m pip install -r requirements.txt
-
-# Variables de entorno (opcional)
 copy .env.example .env
+```
 
-# Arrancar API (desde la raíz del proyecto, no desde app/)
+En `.env` usa `DATABASE_URL=sqlite:///./panaderia.db` y comenta la URL de Postgres.
+
+```powershell
 python -m uvicorn app.main:app --reload
 ```
 
