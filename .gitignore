@@ -1,0 +1,61 @@
+# Entorno y secretos
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# Base de datos local (SQLite)
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+panaderia.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+*.egg-info/
+.eggs/
+*.egg
+
+# Entorno virtual
+venv/
+.venv/
+env/
+
+# Tests y cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.mypy_cache/
+.ruff_cache/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Excel / uploads temporales (cargues locales)
+uploads/
+temp/
+*.tmp
+
+# Logs
+*.log
+logs/
+
+# Docker (volúmenes / datos locales cuando lo montes)
+docker-data/
