@@ -18,3 +18,7 @@ CORS_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
+
+DOCS_USER = os.getenv("DOCS_USER", "").strip()
+DOCS_PASSWORD = os.getenv("DOCS_PASSWORD", "").strip()
+DOCS_AUTH_ENABLED = bool(DOCS_USER and DOCS_PASSWORD)
