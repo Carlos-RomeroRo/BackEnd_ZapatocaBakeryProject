@@ -87,6 +87,32 @@ class SqlCarritoRepository(CarritoRepository):
             raise ValueError(f"Carrito con id {carrito_id} no encontrado")
         return carrito_to_entity(model)
 
+    def eliminar_item(
+        self, carrito_id: str, token_acceso: str, producto_id: int
+    ) -> Carrito:
+        model = self._cargar_carrito(carrito_id)
+        if model is None:
+            raise ValueError(f"Carrito con id {carrito_id} no encontrado")
+
+        self._validar_acceso(model, token_acceso)
+        if model.estado != ESTADO_ACTIVO:
+            raise ValueError("El carrito ya no está activo.")
+
+        item = next(
+            (linea for linea in model.items if linea.producto_id == producto_id),
+            None,
+        )
+        if item is None:
+            raise LookupError("El producto no está en el carrito.")
+
+        self._session.delete(item)
+        self._commit()
+
+        model = self._cargar_carrito(carrito_id)
+        if model is None:
+            raise ValueError(f"Carrito con id {carrito_id} no encontrado")
+        return carrito_to_entity(model)
+
     def marcar_convertido(self, carrito_id: str, token_acceso: str) -> Carrito:
         model = self._cargar_carrito(carrito_id)
         if model is None:

@@ -26,6 +26,12 @@ class CarritoRepository(ABC):
         """Agrega cantidad al ítem existente o crea una nueva línea con precio fijado."""
 
     @abstractmethod
+    def eliminar_item(
+        self, carrito_id: str, token_acceso: str, producto_id: int
+    ) -> Carrito:
+        """Elimina la línea del producto del carrito."""
+
+    @abstractmethod
     def marcar_convertido(self, carrito_id: str, token_acceso: str) -> Carrito:
         """Marca el carrito como convertido en pedido (deja de aceptar cambios)."""
 

@@ -9,15 +9,38 @@ from app.application.use_cases.exportar_trabajadores_excel import (
 from app.application.use_cases.importar_trabajadores_excel import (
     ImportarTrabajadoresExcelUseCase,
 )
+from app.application.use_cases.listar_trabajadores import ListarTrabajadoresUseCase
 from app.infrastructure.database.session import get_db
 from app.infrastructure.excel.trabajador_excel import PandasTrabajadorExcelService
 from app.infrastructure.repositories.sql_trabajador_repository import (
     SqlTrabajadorRepository,
 )
 from app.presentation.api.excel_response import EXCEL_MEDIA_TYPE, excel_file_headers
-from app.presentation.api.schemas import FilaErrorSchema, ImportarExcelResponse
+from app.presentation.api.schemas import (
+    FilaErrorSchema,
+    ImportarExcelResponse,
+    TrabajadorListadoSchema,
+)
 
 router = APIRouter(prefix="/trabajadores", tags=["Trabajadores"])
+
+
+@router.get("", response_model=list[TrabajadorListadoSchema])
+def listar_trabajadores(db: Session = Depends(get_db)):
+    """Catálogo JSON para el frontend (equipo de la panadería)."""
+    repo = SqlTrabajadorRepository(db)
+    use_case = ListarTrabajadoresUseCase(repo)
+    return [
+        TrabajadorListadoSchema(
+            id=t.id,
+            nombre=t.nombre,
+            descripcion=t.descripcion,
+            rol=t.rol,
+            foto=t.foto,
+        )
+        for t in use_case.ejecutar()
+    ]
+
 
 
 def _validar_archivo_excel(archivo: UploadFile) -> None:

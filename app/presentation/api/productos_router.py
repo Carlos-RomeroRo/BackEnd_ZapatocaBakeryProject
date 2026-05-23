@@ -5,13 +5,36 @@ from sqlalchemy.orm import Session
 from app.application.dtos.import_result import ImportarExcelResultado
 from app.application.use_cases.exportar_productos_excel import ExportarProductosExcelUseCase
 from app.application.use_cases.importar_productos_excel import ImportarProductosExcelUseCase
+from app.application.use_cases.listar_productos import ListarProductosUseCase
 from app.infrastructure.database.session import get_db
 from app.infrastructure.excel.producto_excel import PandasProductoExcelService
 from app.infrastructure.repositories.sql_producto_repository import SqlProductoRepository
 from app.presentation.api.excel_response import EXCEL_MEDIA_TYPE, excel_file_headers
-from app.presentation.api.schemas import FilaErrorSchema, ImportarExcelResponse
+from app.presentation.api.schemas import (
+    FilaErrorSchema,
+    ImportarExcelResponse,
+    ProductoListadoSchema,
+)
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
+
+
+@router.get("", response_model=list[ProductoListadoSchema])
+def listar_productos(db: Session = Depends(get_db)):
+    """Catálogo JSON para el frontend."""
+    repo = SqlProductoRepository(db)
+    use_case = ListarProductosUseCase(repo)
+    return [
+        ProductoListadoSchema(
+            id=p.id,
+            nombre=p.nombre,
+            descripcion=p.descripcion,
+            precio=p.precio,
+            foto=p.foto,
+        )
+        for p in use_case.ejecutar()
+    ]
+
 
 
 def _validar_archivo_excel(archivo: UploadFile) -> None:
