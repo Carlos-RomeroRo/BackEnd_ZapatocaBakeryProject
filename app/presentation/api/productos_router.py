@@ -6,6 +6,8 @@ from app.application.dtos.import_result import ImportarExcelResultado
 from app.application.use_cases.exportar_productos_excel import ExportarProductosExcelUseCase
 from app.application.use_cases.importar_productos_excel import ImportarProductosExcelUseCase
 from app.application.use_cases.listar_productos import ListarProductosUseCase
+from app.application.use_cases.listar_productos_por_tipo import ListarProductosPorTipoUseCase
+from app.domain.value_objects.tipo_producto import ETIQUETAS_TIPO, TIPOS_PRODUCTO
 from app.infrastructure.database.session import get_db
 from app.infrastructure.excel.producto_excel import PandasProductoExcelService
 from app.infrastructure.repositories.sql_producto_repository import SqlProductoRepository
@@ -14,26 +16,52 @@ from app.presentation.api.schemas import (
     FilaErrorSchema,
     ImportarExcelResponse,
     ProductoListadoSchema,
+    TipoProductoSchema,
 )
 
 router = APIRouter(prefix="/productos", tags=["Productos"])
 
 
-@router.get("", response_model=list[ProductoListadoSchema])
-def listar_productos(db: Session = Depends(get_db)):
-    """Catálogo JSON para el frontend."""
-    repo = SqlProductoRepository(db)
-    use_case = ListarProductosUseCase(repo)
+def _productos_a_response(productos) -> list[ProductoListadoSchema]:
     return [
         ProductoListadoSchema(
             id=p.id,
             nombre=p.nombre,
             descripcion=p.descripcion,
             precio=p.precio,
+            tipo=p.tipo,
+            tipo_etiqueta=p.tipo_etiqueta,
             foto=p.foto,
         )
-        for p in use_case.ejecutar()
+        for p in productos
     ]
+
+
+@router.get("", response_model=list[ProductoListadoSchema])
+def listar_productos(db: Session = Depends(get_db)):
+    """Catálogo completo para el frontend."""
+    repo = SqlProductoRepository(db)
+    return _productos_a_response(ListarProductosUseCase(repo).ejecutar())
+
+
+@router.get("/tipos", response_model=list[TipoProductoSchema])
+def listar_tipos_producto():
+    """Opciones del clasificador (Todas las categorías usa GET /productos)."""
+    return [
+        TipoProductoSchema(id=tipo, nombre=ETIQUETAS_TIPO[tipo])
+        for tipo in TIPOS_PRODUCTO
+    ]
+
+
+@router.get("/tipo/{tipo}", response_model=list[ProductoListadoSchema])
+def listar_productos_por_tipo(tipo: str, db: Session = Depends(get_db)):
+    """Filtra por tipo: panes, reposteria, comidas_rapidas u otros."""
+    repo = SqlProductoRepository(db)
+    use_case = ListarProductosPorTipoUseCase(repo)
+    try:
+        return _productos_a_response(use_case.ejecutar(tipo))
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
 
 
 

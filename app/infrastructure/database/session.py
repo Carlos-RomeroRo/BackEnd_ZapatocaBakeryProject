@@ -100,10 +100,26 @@ def _migrate_carritos_seguridad() -> None:
             )
 
 
+def _migrate_productos_tipo() -> None:
+    inspector = inspect(engine)
+    if "productos" not in inspector.get_table_names():
+        return
+    columnas = {col["name"] for col in inspector.get_columns("productos")}
+    if "tipo" in columnas:
+        return
+    with engine.begin() as conn:
+        conn.execute(
+            text(
+                "ALTER TABLE productos ADD COLUMN tipo VARCHAR(30) NOT NULL DEFAULT 'otros'"
+            )
+        )
+
+
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
     _migrate_trabajadores_descripcion()
     _migrate_carritos_seguridad()
+    _migrate_productos_tipo()
 
 
 def get_db() -> Generator[Session, None, None]:

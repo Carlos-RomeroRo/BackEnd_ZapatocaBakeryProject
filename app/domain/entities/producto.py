@@ -1,6 +1,11 @@
 from dataclasses import dataclass
 from decimal import Decimal
 
+from app.domain.value_objects.tipo_producto import (
+    TIPO_OTROS,
+    normalizar_tipo_producto,
+)
+
 MAX_DESCRIPCION = 100
 MAX_FOTO_LONGITUD = 500
 
@@ -10,6 +15,7 @@ class Producto:
     nombre: str
     descripcion: str
     precio: Decimal
+    tipo: str = TIPO_OTROS
     foto: str = ""
     id: int | None = None
 
@@ -17,7 +23,11 @@ class Producto:
         self._validar_nombre()
         self._validar_descripcion()
         self._validar_precio()
+        self._validar_tipo()
         self._validar_foto()
+
+    def _validar_tipo(self) -> None:
+        self.tipo = normalizar_tipo_producto(self.tipo)
 
     def _validar_nombre(self) -> None:
         if not self.nombre or not self.nombre.strip():

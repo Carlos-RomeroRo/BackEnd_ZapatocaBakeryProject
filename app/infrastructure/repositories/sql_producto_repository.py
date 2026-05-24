@@ -20,6 +20,7 @@ class SqlProductoRepository(ProductoRepository):
             model.nombre = producto.nombre
             model.descripcion = producto.descripcion
             model.precio = producto.precio
+            model.tipo = producto.tipo
             model.foto = producto.foto or ""
         else:
             model = producto_to_model(producto)
@@ -64,6 +65,15 @@ class SqlProductoRepository(ProductoRepository):
 
     def listar_todos(self) -> list[Producto]:
         stmt = select(ProductoModel).order_by(ProductoModel.nombre)
+        models = self._session.scalars(stmt).all()
+        return [producto_to_entity(model) for model in models]
+
+    def listar_por_tipo(self, tipo: str) -> list[Producto]:
+        stmt = (
+            select(ProductoModel)
+            .where(ProductoModel.tipo == tipo)
+            .order_by(ProductoModel.nombre)
+        )
         models = self._session.scalars(stmt).all()
         return [producto_to_entity(model) for model in models]
 

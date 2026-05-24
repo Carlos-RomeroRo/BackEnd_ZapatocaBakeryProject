@@ -25,5 +25,9 @@ class ProductoRepository(ABC):
         pass
 
     @abstractmethod
+    def listar_por_tipo(self, tipo: str) -> list[Producto]:
+        pass
+
+    @abstractmethod
     def existe_por_nombre(self, nombre: str) -> bool:
         pass

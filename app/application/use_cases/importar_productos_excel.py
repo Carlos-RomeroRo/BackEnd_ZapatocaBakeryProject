@@ -59,5 +59,6 @@ class ImportarProductosExcelUseCase:
             nombre=str(fila.get("nombre", "")),
             descripcion=str(fila.get("descripcion", "")),
             precio=precio,
+            tipo=str(fila.get("tipo", "")),
             foto=str(foto) if foto is not None else "",
         )

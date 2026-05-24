@@ -19,6 +19,7 @@ def producto_to_entity(model: ProductoModel) -> Producto:
         nombre=model.nombre,
         descripcion=model.descripcion,
         precio=Decimal(str(model.precio)),
+        tipo=model.tipo or "otros",
         foto=model.foto or "",
     )
 
@@ -29,6 +30,7 @@ def producto_to_model(producto: Producto) -> ProductoModel:
         nombre=producto.nombre,
         descripcion=producto.descripcion,
         precio=producto.precio,
+        tipo=producto.tipo,
         foto=producto.foto or "",
     )
 

@@ -1,18 +1,20 @@
 from typing import Any
 
 from app.application.ports.excel_ports import ProductoExcelPort
+from app.domain.value_objects.tipo_producto import ETIQUETAS_TIPO
 from app.infrastructure.excel._utils import (
     dataframe_a_filas,
     escribir_excel,
     leer_dataframe,
 )
 
-COLUMNAS = ["nombre", "descripcion", "precio", "foto"]
+COLUMNAS = ["nombre", "descripcion", "precio", "tipo", "foto"]
 
 FILA_EJEMPLO = {
     "nombre": "Pan integral",
     "descripcion": "Pan artesanal de masa madre",
     "precio": 3500,
+    "tipo": "Panes",
     "foto": "https://ejemplo.com/pan.jpg",
 }
 
@@ -31,6 +33,7 @@ class PandasProductoExcelService(ProductoExcelPort):
                 "nombre": f.get("nombre", ""),
                 "descripcion": f.get("descripcion", ""),
                 "precio": f.get("precio", ""),
+                "tipo": ETIQUETAS_TIPO.get(f.get("tipo", ""), f.get("tipo", "")),
                 "foto": f.get("foto", ""),
             }
             for f in filas

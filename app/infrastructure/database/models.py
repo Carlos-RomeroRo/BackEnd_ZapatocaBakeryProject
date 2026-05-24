@@ -14,6 +14,7 @@ class ProductoModel(Base):
     nombre: Mapped[str] = mapped_column(String(200), nullable=False, unique=True)
     descripcion: Mapped[str] = mapped_column(String(100), nullable=False)
     precio: Mapped[Decimal] = mapped_column(Numeric(12, 2), nullable=False)
+    tipo: Mapped[str] = mapped_column(String(30), nullable=False, default="otros")
     foto: Mapped[str] = mapped_column(String(500), nullable=False, default="")
 
 

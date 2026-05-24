@@ -1,11 +1,23 @@
+import re
+import unicodedata
+from io import BytesIO
 from typing import Any
 
 import pandas as pd
-from io import BytesIO
+
+
+def _sin_tildes(texto: str) -> str:
+    normalizado = unicodedata.normalize("NFD", texto)
+    return "".join(c for c in normalizado if unicodedata.category(c) != "Mn")
 
 
 def normalizar_columnas(columnas: list[str]) -> list[str]:
-    return [str(c).strip().lower() for c in columnas]
+    resultado: list[str] = []
+    for columna in columnas:
+        nombre = _sin_tildes(str(columna).strip().lower())
+        nombre = re.sub(r"\s+", "_", nombre)
+        resultado.append(nombre)
+    return resultado
 
 
 def leer_dataframe(contenido: bytes, columnas_requeridas: list[str]) -> pd.DataFrame:

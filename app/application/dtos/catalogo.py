@@ -17,4 +17,6 @@ class ProductoListado:
     nombre: str
     descripcion: str
     precio: Decimal
+    tipo: str
+    tipo_etiqueta: str
     foto: str

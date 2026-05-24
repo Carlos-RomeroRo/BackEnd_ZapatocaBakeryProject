@@ -91,9 +91,16 @@ class TrabajadorListadoSchema(BaseModel):
     foto: str = Field(..., description="URL pública de la imagen")
 
 
+class TipoProductoSchema(BaseModel):
+    id: str = Field(..., description="Identificador para filtros (ej. panes)")
+    nombre: str = Field(..., description="Etiqueta visible en el clasificador")
+
+
 class ProductoListadoSchema(BaseModel):
     id: int
     nombre: str
     descripcion: str
     precio: Decimal
+    tipo: str
+    tipo_etiqueta: str
     foto: str = Field(..., description="URL pública de la imagen")
